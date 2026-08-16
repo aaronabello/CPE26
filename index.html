@@ -1,0 +1,498 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<meta name="theme-color" content="#07111f" />
+<meta name="color-scheme" content="dark" />
+<meta name="mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+<meta name="apple-mobile-web-app-title" content="CPE26 Reviewer" />
+<meta name="format-detection" content="telephone=no" />
+<link rel="manifest" href="manifest.webmanifest" />
+<link rel="icon" href="icon.svg" type="image/svg+xml" />
+<title>CPE26 Master Quiz Reviewer — Responsive Edition</title>
+<style>
+:root {
+  --bg:#07111f; --panel:#0c1728; --panel2:#111f33; --text:#eef4ff; --muted:#9fb0c8;
+  --line:#21344f; --accent:#64d8cb; --accent2:#7aa8ff; --good:#58d68d; --bad:#ff7b7b;
+  --warn:#ffd166; --shadow:0 18px 50px rgba(0,0,0,.28);
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;font-family:Inter,ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;background:
+radial-gradient(circle at 15% 0%,rgba(100,216,203,.12),transparent 32%),
+radial-gradient(circle at 85% 10%,rgba(122,168,255,.12),transparent 32%),var(--bg);color:var(--text);min-height:100vh}
+button,select{font:inherit}
+button{cursor:pointer}
+.shell{max-width:1160px;margin:auto;padding:28px 18px 70px}
+.hero{background:linear-gradient(145deg,rgba(17,31,51,.96),rgba(9,20,36,.96));border:1px solid var(--line);border-radius:26px;padding:30px;box-shadow:var(--shadow);position:relative;overflow:hidden}
+.hero:after{content:"";position:absolute;width:260px;height:260px;border-radius:50%;right:-90px;top:-130px;background:linear-gradient(135deg,rgba(100,216,203,.25),rgba(122,168,255,.15));filter:blur(2px)}
+.eyebrow{color:var(--accent);font-size:.78rem;font-weight:800;letter-spacing:.15em;text-transform:uppercase}
+h1{font-size:clamp(2rem,5vw,4rem);line-height:1;margin:.45rem 0 .8rem;max-width:850px}
+.hero p{color:var(--muted);max-width:760px;line-height:1.65;margin:0}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-top:24px;position:relative;z-index:1}
+.stat{background:rgba(7,17,31,.58);border:1px solid var(--line);border-radius:16px;padding:15px}
+.stat strong{font-size:1.5rem;display:block}
+.stat span{font-size:.78rem;color:var(--muted)}
+.toolbar{display:flex;flex-wrap:wrap;gap:10px;margin:18px 0}
+.btn,.select{border:1px solid var(--line);background:var(--panel);color:var(--text);padding:10px 14px;border-radius:12px;transition:.2s}
+.btn:hover,.select:hover{border-color:#3d5c85;transform:translateY(-1px)}
+.btn.primary{background:linear-gradient(135deg,var(--accent),#55b8ed);color:#04151a;border:0;font-weight:800}
+.btn.ghost{background:transparent}
+.btn.warn{border-color:#5f4d20;color:var(--warn)}
+.tabs{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 18px}
+.tab{border:1px solid var(--line);background:#0a1525;color:var(--muted);padding:9px 13px;border-radius:999px}
+.tab.active{background:rgba(100,216,203,.14);color:var(--accent);border-color:rgba(100,216,203,.4)}
+.quiz-layout{display:grid;grid-template-columns:minmax(0,1fr) 300px;gap:18px;align-items:start}
+.card{background:linear-gradient(145deg,rgba(12,23,40,.98),rgba(8,19,34,.98));border:1px solid var(--line);border-radius:22px;box-shadow:var(--shadow)}
+.quiz-card{padding:24px}
+.meta{display:flex;gap:8px;align-items:center;flex-wrap:wrap;color:var(--muted);font-size:.84rem}
+.pill{border:1px solid var(--line);border-radius:999px;padding:5px 9px;background:#091524}
+.topic{color:var(--accent)}
+.progress-track{height:8px;background:#081220;border-radius:999px;overflow:hidden;margin:18px 0 24px;border:1px solid #16243a}
+.progress-bar{height:100%;width:0;background:linear-gradient(90deg,var(--accent),var(--accent2));transition:.3s}
+.qtext{font-size:clamp(1.2rem,2.2vw,1.55rem);line-height:1.45;margin:0 0 18px}
+.options{display:grid;gap:10px}
+.option{width:100%;text-align:left;border:1px solid var(--line);background:#0a1627;color:var(--text);border-radius:14px;padding:14px 15px;display:flex;gap:12px;align-items:flex-start;line-height:1.45;transition:.18s}
+.option:hover{border-color:#42628c;background:#0e1c30}
+.option .key{width:28px;height:28px;border-radius:8px;display:grid;place-items:center;background:#14243a;color:var(--muted);font-weight:800;flex:0 0 auto}
+.option.selected{border-color:var(--accent2);background:rgba(122,168,255,.1)}
+.option.correct{border-color:rgba(88,214,141,.7);background:rgba(88,214,141,.12)}
+.option.wrong{border-color:rgba(255,123,123,.75);background:rgba(255,123,123,.12)}
+.option:disabled{cursor:default}
+.feedback{margin-top:16px;border-radius:14px;padding:14px 15px;border:1px solid var(--line);background:#081521;display:none;line-height:1.55}
+.feedback.show{display:block}
+.feedback.good{border-color:rgba(88,214,141,.45)}
+.feedback.bad{border-color:rgba(255,123,123,.45)}
+.feedback strong{display:block;margin-bottom:6px}
+.feedback .your-answer{color:var(--bad);margin:4px 0}
+.feedback .correct-answer{color:var(--good);font-weight:800;margin:4px 0}
+.feedback .why{margin-top:8px;color:var(--text)}
+.navrow{display:flex;justify-content:space-between;gap:10px;margin-top:18px}
+.side{padding:18px;position:sticky;top:18px}
+.side h3{margin:0 0 10px}
+.mode-note{color:var(--muted);font-size:.88rem;line-height:1.5}
+.mini-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:14px 0}
+.mini{border:1px solid var(--line);border-radius:13px;padding:11px;background:#091525}
+.mini strong{font-size:1.2rem;display:block}
+.mini span{color:var(--muted);font-size:.75rem}
+.legend{font-size:.82rem;color:var(--muted);display:grid;gap:7px;margin-top:14px}
+.dot{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:7px}
+.dot.good{background:var(--good)}.dot.bad{background:var(--bad)}.dot.open{background:#64748b}
+.section-title{margin:42px 0 12px;font-size:1.55rem}
+.section-sub{color:var(--muted);margin:0 0 18px}
+.scenario-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:14px}
+.scenario{padding:18px}
+.scenario h3{margin:0 0 8px;font-size:1rem}
+.scenario p{color:var(--muted);line-height:1.55;font-size:.92rem}
+.guide{display:none;margin-top:12px;border-top:1px solid var(--line);padding-top:12px;font-size:.9rem;line-height:1.55}
+.guide.show{display:block}
+.guide ul{padding-left:18px}
+.plac{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin:14px 0 22px}
+.plac div{padding:14px;border:1px solid var(--line);border-radius:14px;background:#0a1627}
+.plac b{display:block;color:var(--accent);font-size:1.1rem}
+.quick{padding:22px;margin-top:18px}
+.quick-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.quick-item{border:1px solid var(--line);border-radius:14px;padding:13px;background:#091525}
+.quick-item b{color:var(--accent)}
+.result{display:none;padding:24px;margin-top:18px}
+.result.show{display:block}
+.result h2{margin-top:0}
+.review-list{display:grid;gap:10px;margin-top:14px}
+.review-item{border:1px solid var(--line);border-radius:12px;padding:12px;background:#091525}
+.review-item small{color:var(--muted)}
+.footer{text-align:center;color:#73849d;margin-top:35px;font-size:.82rem}
+/* Cross-device compatibility */
+html{-webkit-text-size-adjust:100%;text-size-adjust:100%;background:var(--bg)}
+body{overflow-x:hidden;min-width:0;padding-left:env(safe-area-inset-left);padding-right:env(safe-area-inset-right)}
+img,svg,video,canvas{max-width:100%;height:auto}
+button,select{min-height:44px;touch-action:manipulation;-webkit-tap-highlight-color:transparent}
+button:focus-visible,select:focus-visible,.tab:focus-visible,.option:focus-visible{outline:3px solid rgba(122,168,255,.65);outline-offset:2px}
+.qtext,.option span:last-child,.feedback,.review-item,.scenario p,.guide,.quick,.hero p{overflow-wrap:anywhere;word-break:normal}
+.toolbar>*{max-width:100%}
+.select{appearance:auto}
+.navrow .btn{min-width:132px}
+.option{min-height:54px}
+.side{max-width:100%}
+
+@media (hover:none),(pointer:coarse){
+  .btn:hover,.select:hover{transform:none}
+  .option:hover{background:#0a1627;border-color:var(--line)}
+  .option.selected:hover{border-color:var(--accent2);background:rgba(122,168,255,.1)}
+  .option.correct:hover{border-color:rgba(88,214,141,.7);background:rgba(88,214,141,.12)}
+  .option.wrong:hover{border-color:rgba(255,123,123,.75);background:rgba(255,123,123,.12)}
+}
+
+@media (max-width:1024px){
+  .shell{max-width:920px}
+  .quiz-layout{grid-template-columns:minmax(0,1fr) 260px}
+}
+
+@media (max-width:900px){
+  .shell{padding-top:20px}
+  .quiz-layout{grid-template-columns:1fr}
+  .side{position:static}
+  .stats{grid-template-columns:repeat(4,minmax(0,1fr))}
+  .scenario-grid{grid-template-columns:1fr}
+  .quick-grid{grid-template-columns:1fr 1fr}
+  .toolbar{display:grid;grid-template-columns:repeat(2,minmax(0,1fr))}
+  .toolbar .btn,.toolbar .select{width:100%}
+}
+
+@media (max-width:640px){
+  .shell{padding:12px max(10px,env(safe-area-inset-right)) calc(58px + env(safe-area-inset-bottom)) max(10px,env(safe-area-inset-left))}
+  .hero{padding:20px 16px;border-radius:20px}
+  h1{font-size:clamp(1.85rem,9vw,2.7rem);line-height:1.06}
+  .hero p{font-size:.95rem;line-height:1.55}
+  .stats{grid-template-columns:1fr 1fr;gap:8px;margin-top:18px}
+  .stat{padding:12px;border-radius:14px}
+  .stat strong{font-size:1.25rem}
+  .toolbar{grid-template-columns:1fr;gap:8px}
+  .toolbar .btn,.toolbar .select{width:100%;min-height:48px}
+  .tabs{display:flex;flex-wrap:nowrap;overflow-x:auto;padding:2px 1px 7px;scrollbar-width:thin;-webkit-overflow-scrolling:touch}
+  .tab{flex:0 0 auto;min-height:44px}
+  .card{border-radius:18px}
+  .quiz-card{padding:17px 14px}
+  .meta{font-size:.78rem;gap:6px}
+  .pill{padding:5px 8px}
+  .progress-track{margin:15px 0 19px}
+  .qtext{font-size:1.15rem;line-height:1.48;margin-bottom:15px}
+  .options{gap:9px}
+  .option{padding:13px 12px;border-radius:13px;gap:10px;min-height:58px}
+  .option .key{width:30px;height:30px;flex-basis:30px}
+  .feedback{padding:13px;margin-top:14px;font-size:.94rem}
+  .navrow{position:sticky;bottom:max(8px,env(safe-area-inset-bottom));z-index:8;background:rgba(7,17,31,.94);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);padding:8px;border:1px solid var(--line);border-radius:15px;margin-top:15px}
+  .navrow .btn{flex:1;min-width:0;min-height:48px}
+  .side{padding:15px}
+  .mini-grid{grid-template-columns:1fr 1fr}
+  .scenario{padding:17px}
+  .plac{grid-template-columns:1fr 1fr}
+  .quick-grid{grid-template-columns:1fr}
+  .section-title{font-size:1.5rem}
+  .result{padding:17px}
+  .review-list{max-height:none}
+}
+
+@media (max-width:380px){
+  .shell{padding-left:8px;padding-right:8px}
+  .hero{padding:18px 13px}
+  .stats{grid-template-columns:1fr 1fr}
+  .quiz-card{padding:15px 11px}
+  .plac{grid-template-columns:1fr}
+  .mini-grid{grid-template-columns:1fr 1fr}
+  .option{padding:12px 10px;font-size:.94rem}
+  .navrow{gap:6px;padding:6px}
+  .navrow .btn{padding:9px 8px;font-size:.9rem}
+}
+
+@media (max-height:540px) and (orientation:landscape){
+  .shell{padding-top:8px}
+  .hero{padding:14px 18px}
+  .hero h1{font-size:1.8rem;margin:.25rem 0 .45rem}
+  .hero p{display:none}
+  .stats{margin-top:10px}
+  .stat{padding:8px 10px}
+  .toolbar{margin:10px 0}
+  .quiz-card{padding:14px}
+  .side{position:static}
+}
+
+@media print{
+  body{background:#fff;color:#111}
+  .hero,.card{box-shadow:none;background:#fff;color:#111;border-color:#ccc}
+  .toolbar,.tabs,.navrow,.side{display:none!important}
+  .quiz-layout{display:block}
+}
+
+</style>
+</head>
+<body>
+<div class="shell">
+  <section class="hero">
+    <div class="eyebrow">CPE26 • Computer Engineering Laws & Professional Practice</div>
+    <h1>Master Quiz Reviewer</h1>
+    <p>A complete interactive question bank built from Modules 1–3. Use <b>Study Mode</b> for instant explanations, then switch to <b>Exam Mode</b> to simulate a multiple-choice quiz. Choices now use closer, same-topic distractors so the answer is less obvious.</p>
+    <div class="stats">
+      <div class="stat"><strong id="totalCount">142</strong><span>Total MCQs</span></div>
+      <div class="stat"><strong>3</strong><span>Modules Covered</span></div>
+      <div class="stat"><strong>15</strong><span>Essay Scenarios</span></div>
+      <div class="stat"><strong id="headerScore">0%</strong><span>Current Accuracy</span></div>
+    </div>
+  </section>
+
+  <div class="toolbar">
+    <select id="mode" class="select" aria-label="Quiz mode">
+      <option value="study">Study Mode — instant feedback</option>
+      <option value="exam">Exam Mode — score at the end</option>
+    </select>
+    <select id="questionOrder" class="select" aria-label="Question order">
+      <option value="ordered">Question Order — In Order (1 → 142)</option>
+      <option value="shuffled">Question Order — Random / Shuffled</option>
+    </select>
+    <button class="btn" id="shuffleBtn">Reshuffle Questions</button>
+    <button class="btn warn" id="resetBtn">Reset Progress</button>
+    <button class="btn ghost" onclick="document.getElementById('essay').scrollIntoView()">Essay Practice ↓</button>
+  </div>
+
+  <div class="tabs" id="tabs"></div>
+
+  <div class="quiz-layout">
+    <main class="card quiz-card">
+      <div class="meta"><span class="pill" id="modulePill"></span><span class="pill topic" id="topicPill"></span><span id="pageLabel"></span></div>
+      <div class="progress-track"><div class="progress-bar" id="progressBar"></div></div>
+      <h2 class="qtext" id="questionText"></h2>
+      <div class="options" id="options"></div>
+      <div class="feedback" id="feedback"></div>
+      <div class="navrow">
+        <button class="btn" id="prevBtn">← Previous</button>
+        <button class="btn primary" id="nextBtn">Next →</button>
+      </div>
+    </main>
+
+    <aside class="card side">
+      <h3>Session</h3>
+      <div class="mode-note" id="modeNote">Choose an answer to see the correct answer and explanation immediately.</div>
+      <div class="mini-grid">
+        <div class="mini"><strong id="answeredStat">0</strong><span>Answered</span></div>
+        <div class="mini"><strong id="correctStat">0</strong><span>Correct</span></div>
+        <div class="mini"><strong id="wrongStat">0</strong><span>Wrong</span></div>
+        <div class="mini"><strong id="remainingStat">0</strong><span>Remaining</span></div>
+      </div>
+      <button class="btn primary" style="width:100%" id="submitBtn">Finish & Score</button>
+      <div class="legend">
+        <div><span class="dot good"></span>Correct answer</div>
+        <div><span class="dot bad"></span>Wrong answer</div>
+        <div><span class="dot open"></span>Not answered yet</div>
+      </div>
+      <p class="mode-note" style="margin-top:14px">Keyboard: <b>1–4</b> choose an option, <b>←/→</b> move between questions.</p>
+    </aside>
+  </div>
+
+  <section class="card result" id="resultBox">
+    <h2>Your Result</h2>
+    <p id="resultText"></p>
+    <div class="review-list" id="reviewList"></div>
+  </section>
+
+  <h2 class="section-title" id="essay">Situational Essay Practice</h2>
+  <p class="section-sub">Use this structure so your answer does not become vague. A strong response identifies the rule, applies it, and ends with a professional action.</p>
+  <div class="plac">
+    <div><b>P — Principle</b><span>Identify the ethical principle/code.</span></div>
+    <div><b>L — Law</b><span>Name the relevant Philippine law, when applicable.</span></div>
+    <div><b>A — Apply</b><span>Explain why the principle/law fits the facts.</span></div>
+    <div><b>C — Correct Action</b><span>State what the professional should do next.</span></div>
+  </div>
+  <div class="scenario-grid" id="scenarioGrid"></div>
+
+  <section class="card quick">
+    <h2 style="margin-top:0">Fast Recall Before the Quiz</h2>
+    <div class="quick-grid">
+      <div class="quick-item"><b>Software Ethics:</b><br>Public → Client → Product → Judgment → Management → Profession → Colleagues → Self</div>
+      <div class="quick-item"><b>ACM:</b><br>Society → Avoid Harm → Honesty → Fairness → IP/Privacy/Confidentiality</div>
+      <div class="quick-item"><b>IEEE:</b><br>Public Safety → Conflict/Integrity → Anti-Bribery/Transparency → Competence/Fair Treatment</div>
+      <div class="quick-item"><b>RA 10173:</b><br>Data Privacy</div>
+      <div class="quick-item"><b>RA 10175:</b><br>Cybercrime — Illegal Access / System Interference / Data Interference / Computer Fraud</div>
+      <div class="quick-item"><b>RA 8792:</b><br>Electronic Commerce — electronic documents/signatures</div>
+      <div class="quick-item"><b>RA 8293:</b><br>Intellectual Property — copyright/software/inventions/trademarks</div>
+      <div class="quick-item"><b>RA 11967:</b><br>Internet Transactions — B2B/B2C, platforms, consumers</div>
+      <div class="quick-item"><b>SWOT-R:</b><br>Strength → Weakness → Opportunities → Threats → Recommendation</div>
+    </div>
+  </section>
+
+  <div class="footer">Offline-ready reviewer • No internet connection required</div>
+</div>
+
+<script>
+const QUESTION_BANK = [{"id":1,"module":"Module 1","topic":"Course Focus","question":"According to the course introduction, CPE26 emphasizes professional and ethical responsibilities, contemporary issues, lifelong learning strategies, and what else?","options":["Trade-offs in professional practice","Applicable IT laws in computer engineering","Engineering solutions and societal effects","Business and management issues"],"answer":1,"explanation":"The course description explicitly includes applicable IT laws in the field of computer engineering.","page":"Module 1, p. 2"},{"id":2,"module":"Module 1","topic":"Professional Code of Ethics","question":"A Professional Code of Ethics is best defined as:","options":["An internal procedure manual that standardizes technical work","A legally enforceable statute defining criminal offenses in a profession","A statement of personal values used without reference to professional obligations","A set of guidelines that establishes acceptable behavior for members of a profession"],"answer":3,"explanation":"The module defines it as guidelines designed to set out acceptable behavior of members of a group, association, or profession.","page":"Module 1, p. 6"},{"id":3,"module":"Module 1","topic":"Professional Code of Ethics","question":"Which is a benefit of following a professional code?","options":["Trust and respect from the general public","Guaranteed recognition as a certified professional","Automatic protection from professional liability","Priority of organizational interests over public trust"],"answer":0,"explanation":"The module lists trust and respect from the general public among the benefits.","page":"Module 1, p. 7"},{"id":4,"module":"Module 1","topic":"Professional Code of Ethics","question":"Which item is listed as a benefit of following a professional code?","options":["Mandatory legal immunity for members","Automatic technical certification","Ethical decision making","Freedom to disregard evaluation benchmarks"],"answer":2,"explanation":"Ethical decision making appears directly in the benefits list.","page":"Module 1, p. 7"},{"id":5,"module":"Module 1","topic":"Professional Code of Ethics","question":"Which of the following is NOT presented as a benefit of following a professional code?","options":["Integrity and good judgment","Guaranteed immunity from mistakes","Evaluation benchmark","High standards of practice and ethical behavior"],"answer":1,"explanation":"The module lists the first three; it does not promise immunity from mistakes.","page":"Module 1, p. 7"},{"id":6,"module":"Module 1","topic":"Ethics","question":"The module broadly describes ethics as the way we understand life in terms of:","options":["Acceptable conduct established by a professional association","Compliance with laws regulating professional practice","The social and ethical impacts created by information technology","Good and bad or right and wrong"],"answer":3,"explanation":"Ethics is framed in terms of good/bad and right/wrong.","page":"Module 1, p. 9"},{"id":7,"module":"Module 1","topic":"Ethics","question":"Moral theories are used primarily to help us answer which question?","options":["What should I do in this situation?","Which law gives legal force to this digital transaction?","What consequences can this technology create for society?","Which rule applies to this professional organization?"],"answer":0,"explanation":"The slide explicitly frames moral theories around the question “What should I do in this situation?”","page":"Module 1, p. 10"},{"id":8,"module":"Module 1","topic":"Ethics","question":"The Socratic approach used to judge whether an ethical theory is useful is associated with:","options":["Kevin Bowyer","James Moor","Socrates","Don Gotterbarn"],"answer":2,"explanation":"The module attributes the Socratic approach to Socrates.","page":"Module 1, p. 9"},{"id":9,"module":"Module 1","topic":"Ethics","question":"According to the module, a useful ethical theory should allow a person to:","options":["Identify a professional rule and follow it without defending the conclusion","Examine moral problems, reach conclusions, and defend them","Reach a conclusion mainly from technical efficiency and organizational policy","Separate moral questions from professional decision-making"],"answer":1,"explanation":"The module says a useful theory helps examine moral problems, reach conclusions, and defend those conclusions.","page":"Module 1, p. 9"},{"id":10,"module":"Module 1","topic":"Organizations","question":"Which organization is explicitly listed among the codes/associations discussed in the module?","options":["Philippine Association of Software Engineers","Philippine Institute of Information Systems Professionals","Information Systems Security Association Philippines","Institute of Computer Engineers of the Philippines, Inc. (ICpEP Inc.)"],"answer":3,"explanation":"ICpEP Inc. is named on the slide listing computing professional codes and associations.","page":"Module 1, p. 11"},{"id":11,"module":"Module 1","topic":"Filipino IT Professionals Code","question":"Which action best follows the Code of Ethics of the Filipino IT Professionals?","options":["Promote public knowledge and appreciation of IT","Promote public knowledge of IT but treat professional competence as optional","Promote IT knowledge only when it benefits the professional's employer","Promote public knowledge of IT while avoiding responsibility for its effects"],"answer":0,"explanation":"The first statement promotes public knowledge, understanding, and appreciation of Information Technology.","page":"Module 1, p. 12"},{"id":12,"module":"Module 1","topic":"Filipino IT Professionals Code","question":"A Filipino IT professional should consider what in the performance of work?","options":["Technical performance and project completion above public consequences","The employer's interest provided no law is violated","General welfare, public welfare, and public good","The client's interest before broader social effects"],"answer":2,"explanation":"The code explicitly requires considering general welfare, public welfare, and public good.","page":"Module 1, p. 12"},{"id":13,"module":"Module 1","topic":"Filipino IT Professionals Code","question":"How should goods or professional services be advertised under the code?","options":["Professionally, even when claims exceed the provider's actual competence","Clearly and truthfully","Truthfully, but only after excluding limitations that could reduce demand","Clearly, provided promotional claims are based on expected rather than verified capability"],"answer":1,"explanation":"The code requires clear and truthful advertising of goods or professional services.","page":"Module 1, p. 12"},{"id":14,"module":"Module 1","topic":"Filipino IT Professionals Code","question":"Which area of law does the Filipino IT Professionals Code specifically say should be strictly observed?","options":["Data privacy and cybercrime laws only","Employment and organizational policy requirements only","Electronic-commerce and consumer-transaction laws only","Intellectual property and patent laws"],"answer":3,"explanation":"The slide specifically mentions intellectual-property laws, patent laws, and related IT laws.","page":"Module 1, p. 12"},{"id":15,"module":"Module 1","topic":"Filipino IT Professionals Code","question":"A professional accepts a project but knowingly lacks the required skills. Which code idea is most directly violated?","options":["Use skills with competence and professionalism","Promote public understanding of IT before accepting responsibility","Maintain confidentiality even when competence is insufficient","Prioritize product quality while allowing unqualified work if supervised"],"answer":0,"explanation":"The code requires accepting responsibility for work and using skills with competence and professionalism.","page":"Module 1, p. 12"},{"id":16,"module":"Module 1","topic":"Filipino IT Professionals Code","question":"A professional falsely claims to be an expert in cybersecurity. Which duty is violated?","options":["Disclose confidential information only to prove technical ability","Advertise services clearly even when expertise is overstated","Make truthful statements about areas of competence","Accept responsibility for work regardless of actual competence"],"answer":2,"explanation":"The code requires truthful statements about one’s areas of competence and product/service capabilities.","page":"Module 1, p. 12"},{"id":17,"module":"Module 1","topic":"Filipino IT Professionals Code","question":"A professional shares confidential client information without permission. Which duty is violated?","options":["Truthful advertising","Confidentiality","Public welfare","Professional competence"],"answer":1,"explanation":"The code states confidential information obtained during professional duties should not be disclosed without consent except where required by law.","page":"Module 1, p. 12"},{"id":18,"module":"Module 1","topic":"Filipino IT Professionals Code","question":"Which quality standard does the Filipino IT Professionals Code expect?","options":["Quality determined solely by the employer's preferred standard","Quality balanced mainly against cost and schedule","Quality sufficient to satisfy only minimum project acceptance","Highest quality in products and services"],"answer":3,"explanation":"The code says to strive to attain the highest quality in both products and services.","page":"Module 1, p. 12"},{"id":19,"module":"Module 1","topic":"AITP Code","question":"Under the AITP Code of Ethics, the obligation to fellow members includes:","options":["Treating them with honesty and respect","Treating fellow members fairly only when they belong to the same organization","Protecting society by refusing all access to professional knowledge","Prioritizing an employer's interest over obligations to fellow members"],"answer":0,"explanation":"The AITP slide says members should cooperate and treat fellow members with honesty and respect.","page":"Module 1, p. 13"},{"id":20,"module":"Module 1","topic":"AITP Code","question":"Which AITP obligation emphasizes protecting privacy and confidentiality while contributing to public understanding of IT?","options":["Obligation to management","Obligation to employer","Obligation to society","Obligation to fellow members"],"answer":2,"explanation":"The obligation to society includes disseminating knowledge while protecting privacy and confidentiality.","page":"Module 1, p. 13"},{"id":21,"module":"Module 1","topic":"AITP Code","question":"An IT professional is expected to guard an employer’s interests and advise the employer wisely and honestly. This is the obligation to:","options":["College or University","Employer","Management","Society"],"answer":1,"explanation":"Those duties are listed under the obligation to one’s employer.","page":"Module 1, p. 13"},{"id":22,"module":"Module 1","topic":"Software Engineering Code","question":"Which sequence correctly lists the eight Software Engineering Code principles in module order?","options":["Public, Product, Client & Employer, Judgment, Management, Colleagues, Profession, Self","Public, Client & Employer, Judgment, Product, Management, Profession, Self, Colleagues","Client & Employer, Public, Product, Judgment, Profession, Management, Colleagues, Self","Public, Client & Employer, Product, Judgment, Management, Profession, Colleagues, Self"],"answer":3,"explanation":"The module presents the eight principles in that order from Public through Self.","page":"Module 1, pp. 14–21"},{"id":23,"module":"Module 1","topic":"Software Engineering Code","question":"A software engineer discovers that a released medical system could seriously endanger users. Which principle most directly requires action consistent with public interest?","options":["Public","Client and Employer","Product","Judgment"],"answer":0,"explanation":"Principle 1 is Public: software engineers shall act consistently with the public interest.","page":"Module 1, p. 14"},{"id":24,"module":"Module 1","topic":"Software Engineering Code","question":"Approving software only when there is a well-founded belief that it is safe and properly tested belongs most directly to:","options":["Product","Client and Employer","Public","Judgment"],"answer":2,"explanation":"The Public principle includes approving software only when there is a well-founded belief it is safe, meets specifications, and passes appropriate tests.","page":"Module 1, p. 14"},{"id":25,"module":"Module 1","topic":"Software Engineering Code","question":"Which principle focuses on acting in the best interests of the client and employer while remaining consistent with public interest?","options":["Management","Client and Employer","Public","Profession"],"answer":1,"explanation":"Principle 2 is Client and Employer.","page":"Module 1, p. 15"},{"id":26,"module":"Module 1","topic":"Software Engineering Code","question":"A programmer uses software that was obtained illegally for a client project. Which principle is most directly violated?","options":["Judgment","Profession","Product","Client and Employer"],"answer":3,"explanation":"The Client and Employer principle states that engineers should not knowingly use software obtained or retained illegally or unethically.","page":"Module 1, p. 15"},{"id":27,"module":"Module 1","topic":"Software Engineering Code","question":"Keeping private confidential information gained through professional work is emphasized under:","options":["Client and Employer","Colleagues","Profession","Judgment"],"answer":0,"explanation":"The Client and Employer principle explicitly protects confidential information.","page":"Module 1, p. 15"},{"id":28,"module":"Module 1","topic":"Software Engineering Code","question":"Which principle says software products and related modifications should meet the highest professional standards possible?","options":["Profession","Public","Product","Management"],"answer":2,"explanation":"Principle 3 is Product.","page":"Module 1, p. 16"},{"id":29,"module":"Module 1","topic":"Software Engineering Code","question":"Realistic estimates of cost, scheduling, personnel, quality, and outcomes are most closely associated with:","options":["Colleagues","Product","Public","Judgment"],"answer":1,"explanation":"The Product principle includes realistic quantitative estimates and disclosure of uncertainty.","page":"Module 1, p. 16"},{"id":30,"module":"Module 1","topic":"Software Engineering Code","question":"Testing, debugging, and reviewing software are emphasized most directly under:","options":["Self","Management","Public","Product"],"answer":3,"explanation":"The Product principle requires adequate testing, debugging, and review.","page":"Module 1, p. 16"},{"id":31,"module":"Module 1","topic":"Software Engineering Code","question":"Which principle requires integrity and independence in professional judgment?","options":["Judgment","Product","Public","Profession"],"answer":0,"explanation":"Principle 4 is Judgment.","page":"Module 1, p. 17"},{"id":32,"module":"Module 1","topic":"Software Engineering Code","question":"A software engineer accepts a bribe to approve a system. Which Software Engineering Code principle is most directly violated?","options":["Profession","Client and Employer","Judgment","Management"],"answer":2,"explanation":"The Judgment principle explicitly rejects deceptive financial practices such as bribery.","page":"Module 1, p. 17"},{"id":33,"module":"Module 1","topic":"Software Engineering Code","question":"Disclosing conflicts of interest that cannot reasonably be avoided belongs most directly to:","options":["Client and Employer","Judgment","Profession","Management"],"answer":1,"explanation":"The Judgment principle requires disclosure of conflicts of interest.","page":"Module 1, p. 17"},{"id":34,"module":"Module 1","topic":"Software Engineering Code","question":"Which principle focuses on ethical leadership in software development and maintenance?","options":["Public","Self","Profession","Management"],"answer":3,"explanation":"Principle 5 is Management.","page":"Module 1, p. 18"},{"id":35,"module":"Module 1","topic":"Software Engineering Code","question":"A manager punishes an employee for raising an ethical concern about a project. Which principle is most directly violated?","options":["Management","Profession","Colleagues","Judgment"],"answer":0,"explanation":"The Management principle says not to punish anyone for expressing ethical concerns about a project.","page":"Module 1, p. 18"},{"id":36,"module":"Module 1","topic":"Software Engineering Code","question":"Which principle asks software engineers to advance the integrity and reputation of the profession?","options":["Public","Management","Profession","Self"],"answer":2,"explanation":"Principle 6 is Profession.","page":"Module 1, p. 19"},{"id":37,"module":"Module 1","topic":"Software Engineering Code","question":"Promoting public knowledge of software engineering is part of which principle?","options":["Management","Profession","Self","Public"],"answer":1,"explanation":"The Profession principle includes promoting public knowledge of software engineering.","page":"Module 1, p. 19"},{"id":38,"module":"Module 1","topic":"Software Engineering Code","question":"Giving proper credit for another person’s work is emphasized under:","options":["Client and Employer","Profession","Self","Colleagues"],"answer":3,"explanation":"Principle 7, Colleagues, includes crediting the work of others and refraining from undue credit.","page":"Module 1, p. 20"},{"id":39,"module":"Module 1","topic":"Software Engineering Code","question":"Reviewing another professional’s work objectively and candidly belongs to:","options":["Colleagues","Judgment","Client and Employer","Profession"],"answer":0,"explanation":"The Colleagues principle says to review the work of others objectively, candidly, and in a properly documented way.","page":"Module 1, p. 20"},{"id":40,"module":"Module 1","topic":"Software Engineering Code","question":"Which principle most directly emphasizes lifelong learning about software engineering practice?","options":["Product","Profession","Self","Management"],"answer":2,"explanation":"Principle 8 is Self, which explicitly requires participation in lifelong learning.","page":"Module 1, p. 21"},{"id":41,"module":"Module 1","topic":"Software Engineering Code","question":"Improving knowledge of standards and laws governing one’s software work is part of:","options":["Profession","Self","Client and Employer","Product"],"answer":1,"explanation":"The Self principle includes improving knowledge of relevant standards and laws.","page":"Module 1, p. 21"},{"id":42,"module":"Module 1","topic":"Computer Ethics","question":"Computer ethics is best described in the module as:","options":["A study of technical standards for making software safe and reliable","A legal framework governing cybercrime and digital transactions","A professional code establishing acceptable behavior for computing practitioners","A branch of applied ethics studying social and ethical impacts of IT"],"answer":3,"explanation":"The module defines computer ethics as applied ethics focused on the social and ethical impacts of information technology.","page":"Module 1, p. 23"},{"id":43,"module":"Module 1","topic":"Computer Ethics","question":"A new technology creates situations for which no adequate policies exist. This is called:","options":["Policy Vacuum","Conceptual Vacuum","Invisibility Factor","Logical Malleability"],"answer":0,"explanation":"Policy Vacuum describes situations where no policies exist or existing policies are inadequate.","page":"Module 1, p. 24"},{"id":44,"module":"Module 1","topic":"Computer Ethics","question":"A lack of a coherent conceptual framework needed to formulate policy is called:","options":["Impact on Society","Policy Vacuum","Conceptual Vacuum","Invisibility Factor"],"answer":2,"explanation":"The module defines Conceptual Vacuum in terms of needing a coherent conceptual framework for policy action.","page":"Module 1, p. 24"},{"id":45,"module":"Module 1","topic":"Computer Ethics","question":"Which property refers to computers being usable as a universal tool?","options":["Impact on Society","Logical Malleability","Conceptual Vacuum","Invisibility Factor"],"answer":1,"explanation":"The slide associates “computers as a universal tool” with Logical Malleability.","page":"Module 1, p. 25"},{"id":46,"module":"Module 1","topic":"Computer Ethics","question":"Invisible abuse, invisible programming values, and invisible complex calculations are examples of:","options":["Logical Malleability","Policy Vacuum","Impact on Society","Invisibility Factor"],"answer":3,"explanation":"Those three are listed under the Invisibility Factor.","page":"Module 1, p. 25"},{"id":47,"module":"Module 1","topic":"Computer Ethics","question":"Which set matches the three levels of computer ethics exactly as shown in the module?","options":["POP, PARA, THEORETICAL","POP, PARA, APPLIED","PRACTICAL, PARA, THEORETICAL","POP, PROFESSIONAL, THEORETICAL"],"answer":0,"explanation":"The slide lists POP, PARA, and THEORETICAL. The module does not further define POP and PARA.","page":"Module 1, p. 26"},{"id":48,"module":"Module 1","topic":"Moral Responsibility","question":"Which set contains only professional obligations named on the Moral Responsibilities slide?","options":["Candor, quality, security, public welfare, loyalty, competence","Honesty, competence, fairness, accountability, transparency, privacy","Honesty, candor, competence, diligence, loyalty, discretion","Honesty, diligence, transparency, fairness, discretion, public interest"],"answer":2,"explanation":"The slide names honesty, candor, competence, diligence, loyalty, and discretion.","page":"Module 1, p. 27"},{"id":49,"module":"Module 1","topic":"Safety-Critical Systems","question":"A safety-critical system is a computer system that can have:","options":["A direct effect on the confidentiality of professional information","A direct life-threatening impact","A direct financial impact that makes a system commercially critical","A significant effect on professional reputation if it fails"],"answer":1,"explanation":"The module defines safety-critical systems as systems that can have a direct life-threatening impact.","page":"Module 1, p. 27"},{"id":50,"module":"Module 1","topic":"Social Networking Ethics","question":"Which item is listed as a social-networking ethical issue in the module?","options":["Professional certifications","Merchant verification","Electronic signatures","Posting pictures and videos"],"answer":3,"explanation":"The slide lists posting pictures and videos, memes, entertainment quizzes, and AI apps.","page":"Module 1, p. 28"},{"id":51,"module":"Module 1","topic":"Social Networking Ethics","question":"Which set contains only social-networking ethical issues listed in the module?","options":["Memes, entertainment quizzes, AI apps","AI apps, privacy by design, posting pictures","Posting pictures, electronic signatures, AI apps","Memes, merchant verification, entertainment quizzes"],"answer":0,"explanation":"Memes, entertainment quizzes, and AI apps are all explicitly listed.","page":"Module 1, p. 28"},{"id":52,"module":"Module 2","topic":"Foundations","question":"The professional code of ethics for computing professionals in the Philippines is guided by international standards such as:","options":["AITP, ICpEP Inc., and the Philippine Computer Society","ACM, AITP, and the Data Privacy Act","ACM, IEEE, and the Software Engineering Code of Ethics","IEEE, ICpEP Inc., and the Internet Transactions Act"],"answer":2,"explanation":"The module identifies ACM, IEEE, and the Software Engineering Code of Ethics as major international standards.","page":"Module 2, p. 3"},{"id":53,"module":"Module 2","topic":"Why Ethics Matters","question":"Which is NOT one of the four reasons ethics matters in computing listed in the module?","options":["Supporting accountability and transparency","Eliminating the need for laws","Protecting privacy and security","Guiding responsible technology"],"answer":1,"explanation":"The first three are listed. Ethics does not eliminate the need for laws.","page":"Module 2, p. 4"},{"id":54,"module":"Module 2","topic":"Why Ethics Matters","question":"Guiding responsible technology is intended to ensure:","options":["Technical innovation even when public consequences are uncertain","Maximum system efficiency as the primary ethical outcome","Compliance with professional standards regardless of societal effects","Beneficial outcomes for society"],"answer":3,"explanation":"The slide says ethics directs responsible creation and use of technology to ensure beneficial outcomes for society.","page":"Module 2, p. 4"},{"id":55,"module":"Module 2","topic":"Professional Responsibilities","question":"Which is identified as a primary responsibility of computing professionals?","options":["User protection","Technology adoption","Professional autonomy","Organizational profitability"],"answer":0,"explanation":"The module specifically identifies user protection as a primary responsibility.","page":"Module 2, p. 5"},{"id":56,"module":"Module 2","topic":"Professional Responsibilities","question":"Why is maintaining professional competence important?","options":["To eliminate the need for independent professional judgment","To make legal compliance unnecessary once a person is experienced","To keep up with evolving technologies","To ensure technical knowledge remains fixed and standardized"],"answer":2,"explanation":"The slide says maintaining knowledge and competence is essential to keep up with evolving technologies.","page":"Module 2, p. 5"},{"id":57,"module":"Module 2","topic":"ACM Code","question":"Which ACM principle focuses on positive societal impact and advancing public interests?","options":["Be Honest and Trustworthy","Contribute to Society and Human Well-Being","Avoid Harm","Promote Fairness and Non-Discrimination"],"answer":1,"explanation":"The first ACM principle in the module is Contribute to Society and Human Well-Being.","page":"Module 2, p. 7"},{"id":58,"module":"Module 2","topic":"ACM Code","question":"Technology should uphold fundamental human rights under which ACM principle?","options":["Promote Fairness and Non-Discrimination","Respect Intellectual Property, Privacy, and Confidentiality","Avoid Harm","Contribute to Society and Human Well-Being"],"answer":3,"explanation":"The Society and Human Well-Being slide says technology should advance public interests and uphold fundamental human rights.","page":"Module 2, p. 7"},{"id":59,"module":"Module 2","topic":"ACM Code","question":"Which types of harm are explicitly mentioned under Avoid Harm?","options":["Physical, financial, psychological, and social","Physical, psychological, legal, and technical","Physical, financial, environmental, and organizational","Financial, social, professional, and environmental"],"answer":0,"explanation":"The module lists physical, financial, psychological, and social harm.","page":"Module 2, p. 8"},{"id":60,"module":"Module 2","topic":"ACM Code","question":"Risk assessment is especially emphasized under which ACM principle?","options":["Contribute to Society and Human Well-Being","Respect Intellectual Property, Privacy, and Confidentiality","Avoid Harm","Be Honest and Trustworthy"],"answer":2,"explanation":"The Avoid Harm slide emphasizes thorough risk assessment to identify and mitigate negative impacts.","page":"Module 2, p. 8"},{"id":61,"module":"Module 2","topic":"ACM Code","question":"Acknowledging limitations and uncertainties is part of:","options":["Avoid Harm","Be Honest and Trustworthy","Respect Intellectual Property, Privacy, and Confidentiality","Promote Fairness and Non-Discrimination"],"answer":1,"explanation":"The module says disclosing limitations fosters trust and responsible decision-making.","page":"Module 2, p. 9"},{"id":62,"module":"Module 2","topic":"ACM Code","question":"An AI hiring tool discriminates against applicants. Which ACM principle is most directly involved?","options":["Contribute to Society and Human Well-Being","Avoid Harm","Be Honest and Trustworthy","Promote Fairness and Non-Discrimination"],"answer":3,"explanation":"The fairness principle requires equitable treatment and discourages discrimination in design, hiring, and digital services.","page":"Module 2, p. 10"},{"id":63,"module":"Module 2","topic":"ACM Code","question":"Honoring copyrights, patents, and licenses belongs to:","options":["Respect Intellectual Property, Privacy, and Confidentiality","Promote Fairness and Non-Discrimination","Be Honest and Trustworthy","Contribute to Society and Human Well-Being"],"answer":0,"explanation":"The module explicitly groups intellectual property, privacy, and confidentiality together.","page":"Module 2, p. 11"},{"id":64,"module":"Module 2","topic":"ACM Code","question":"Safeguarding personal information is described as:","options":["A secondary consideration when system functionality is achieved","A legal concern separated from professional ethical conduct","A key ethical responsibility","A responsibility that applies only after a privacy incident occurs"],"answer":2,"explanation":"The module calls protecting privacy a key ethical responsibility in professional conduct.","page":"Module 2, p. 11"},{"id":65,"module":"Module 2","topic":"Professional Responsibilities","question":"Which set exactly matches the four professional responsibilities listed in the module?","options":["Commitment to Quality, Ethical Leadership, Privacy by Design, Adhering to Laws","Commitment to Quality, Maintaining Competence, Adhering to Laws, Security Considerations","Commitment to Quality, Maintaining Competence, Legal Compliance, Public Welfare","Professional Competence, Privacy Protection, Security Considerations, Ethical Leadership"],"answer":1,"explanation":"Those four are listed on the Professional Responsibilities slide.","page":"Module 2, p. 12"},{"id":66,"module":"Module 2","topic":"IEEE Code","question":"Which IEEE area focuses on ensuring technology improves public safety and health?","options":["Conflicts of Interest and Integrity","Honesty, Anti-Bribery, and Transparency","Professional Competence and Fair Treatment","Public Safety, Health, and Welfare"],"answer":3,"explanation":"This is the first IEEE area in the module.","page":"Module 2, p. 14"},{"id":67,"module":"Module 2","topic":"IEEE Code","question":"Professionals should disclose technological risks to individuals or the environment under:","options":["Public Safety, Health, and Welfare","Professional Competence and Fair Treatment","Conflicts of Interest and Integrity","Honesty, Anti-Bribery, and Transparency"],"answer":0,"explanation":"The IEEE public safety slide specifically requires disclosure of technological risks.","page":"Module 2, p. 14"},{"id":68,"module":"Module 2","topic":"IEEE Code","question":"A professional has a conflict of interest that cannot be avoided. What should be done according to the module?","options":["Transfer the decision to another person without disclosing the original conflict","Continue the work if the professional believes objectivity can be maintained","Disclose it transparently to relevant parties","Avoid the conflict privately without informing affected parties"],"answer":2,"explanation":"The Conflicts of Interest and Integrity section requires disclosure of conflicts.","page":"Module 2, p. 15"},{"id":69,"module":"Module 2","topic":"IEEE Code","question":"Professional decisions should be based on facts and evidence. This is called:","options":["Professional competence","Objective decision making","Transparent conduct","Independent judgment"],"answer":1,"explanation":"Objective decision making is named under Conflicts of Interest and Integrity.","page":"Module 2, p. 15"},{"id":70,"module":"Module 2","topic":"IEEE Code","question":"Rejecting bribery is part of which IEEE area?","options":["Professional Competence and Fair Treatment","Conflicts of Interest and Integrity","Public Safety, Health, and Welfare","Honesty, Anti-Bribery, and Transparency"],"answer":3,"explanation":"The module explicitly names rejection of bribery in this section.","page":"Module 2, p. 16"},{"id":71,"module":"Module 2","topic":"IEEE Code","question":"Openly acknowledging professional mistakes is included under:","options":["Professional Competence and Fair Treatment","Conflicts of Interest and Integrity","Public Safety, Health, and Welfare","Honesty, Anti-Bribery, and Transparency"],"answer":0,"explanation":"The competence/fair treatment slide includes acknowledging mistakes to foster trust and continuous improvement.","page":"Module 2, p. 17"},{"id":72,"module":"Module 2","topic":"Software Engineering Code","question":"In the Module 2 summary, software engineers must prioritize ethics so software benefits society. This is:","options":["Product Quality and Professional Judgment","Client and Employer Responsibilities","Public Interest","Profession, Colleagues, and Self"],"answer":2,"explanation":"The Software Engineering Code section starts with Public Interest.","page":"Module 2, p. 19"},{"id":73,"module":"Module 2","topic":"Software Engineering Code","question":"Acting with integrity while responsibly prioritizing client interests is emphasized under:","options":["Profession, Colleagues, and Self","Client and Employer Responsibilities","Product Quality and Professional Judgment","Public Interest"],"answer":1,"explanation":"The module says software engineers must act with integrity and prioritize clients’ interests responsibly and transparently.","page":"Module 2, p. 20"},{"id":74,"module":"Module 2","topic":"Software Engineering Code","question":"High product standards, integrity in development, independent judgment, and accountability are grouped under:","options":["Client and Employer Responsibilities","Profession, Colleagues, and Self","Management and Professional Leadership","Product Quality and Professional Judgment"],"answer":3,"explanation":"Those four points are exactly the content of the Product Quality and Professional Judgment slide.","page":"Module 2, p. 21"},{"id":75,"module":"Module 2","topic":"Software Engineering Code","question":"Leaders creating environments that prioritize ethical software development is part of:","options":["Management and Professional Leadership","Profession, Colleagues, and Self","Public Interest","Product Quality and Professional Judgment"],"answer":0,"explanation":"The module says leaders must create and maintain ethical development environments.","page":"Module 2, p. 22"},{"id":76,"module":"Module 2","topic":"Software Engineering Code","question":"Continuous learning and ethical behavior are emphasized in which combined area?","options":["Client and Employer Responsibilities","Product Quality and Professional Judgment","Profession, Colleagues, and Self","Management and Professional Leadership"],"answer":2,"explanation":"The final Software Engineering Code summary slide groups profession, colleagues, and self, including lifelong learning and ethics.","page":"Module 2, p. 23"},{"id":77,"module":"Module 2","topic":"Modern Ethical Issues","question":"Which is one of the four ethical issues in modern computing listed in the module?","options":["Electronic Documents and Digital Signatures","Algorithmic Bias and AI Governance","Privacy by Design and Secure Development","Professional Competence and Fair Treatment"],"answer":1,"explanation":"Algorithmic bias and AI governance is one of the four listed issues.","page":"Module 2, p. 25"},{"id":78,"module":"Module 2","topic":"Modern Ethical Issues","question":"Which set contains only ethical issues listed in the module?","options":["Privacy and Security Risks; Algorithmic Bias and AI Governance; Misinformation and Surveillance; Consumer Protection","Privacy and Security Risks; Cybercrime Prevention; Digital Commerce; Intellectual Property Misuse","Algorithmic Bias and AI Governance; Public Safety and Welfare; Misinformation and Surveillance; Intellectual Property Misuse","Privacy and Security Risks; Algorithmic Bias and AI Governance; Misinformation and Surveillance; Intellectual Property Misuse"],"answer":3,"explanation":"Those four are the complete set presented on the slide.","page":"Module 2, p. 25"},{"id":79,"module":"Module 2","topic":"RA 10173","question":"RA 10173 is the:","options":["Data Privacy Act of 2012","Electronic Commerce Act","Intellectual Property Code","Cybercrime Prevention Act of 2012"],"answer":0,"explanation":"RA 10173 is the Data Privacy Act of 2012.","page":"Module 2, p. 26"},{"id":80,"module":"Module 2","topic":"RA 10173","question":"Which concept is specifically protected under RA 10173 in the module?","options":["Merchant identity in online marketplaces","Electronic documents used in transactions","Personal information","Software against unauthorized reproduction"],"answer":2,"explanation":"The law safeguards personal data from unauthorized access and misuse.","page":"Module 2, p. 26"},{"id":81,"module":"Module 2","topic":"RA 10173","question":"Under the module, data subjects are granted:","options":["Specific rights over copyrighted software and inventions","Specific rights over their personal information","Specific rights over electronic signatures used in transactions","Specific rights over merchant verification records"],"answer":1,"explanation":"The slide explicitly states that data subjects have specific rights over personal information.","page":"Module 2, p. 26"},{"id":82,"module":"Module 2","topic":"RA 10173","question":"Organizations are expected to implement what under RA 10173?","options":["Copyright and licensing controls as substitutes for privacy safeguards","Electronic-signature rules as the primary safeguard for personal data","Merchant-verification and consumer-support procedures for all data processing","Security measures and policies for lawful processing and protection of personal data"],"answer":3,"explanation":"The module lists organizational safeguards, including security measures and policies.","page":"Module 2, p. 26"},{"id":83,"module":"Module 2","topic":"RA 10175","question":"RA 10175 is the:","options":["Cybercrime Prevention Act of 2012","Internet Transactions Act","Electronic Commerce Act","Data Privacy Act of 2012"],"answer":0,"explanation":"RA 10175 is the Cybercrime Prevention Act of 2012.","page":"Module 2, p. 27"},{"id":84,"module":"Module 2","topic":"RA 10175","question":"Entering a computer system without authorization is:","options":["Computer Fraud","Data Interference","Illegal Access","System Interference"],"answer":2,"explanation":"The module defines Illegal Access as unauthorized access to computer systems.","page":"Module 2, p. 27"},{"id":85,"module":"Module 2","topic":"RA 10175","question":"Intentionally disrupting or damaging a computer system or network is:","options":["Computer Fraud","System Interference","Illegal Access","Data Interference"],"answer":1,"explanation":"System Interference criminalizes actions that disrupt or damage systems or networks.","page":"Module 2, p. 27"},{"id":86,"module":"Module 2","topic":"RA 10175","question":"Unauthorized alteration or deletion of data is:","options":["Illegal Access","Computer Fraud","System Interference","Data Interference"],"answer":3,"explanation":"Data Interference protects data integrity from unauthorized alteration or deletion.","page":"Module 2, p. 27"},{"id":87,"module":"Module 2","topic":"RA 10175","question":"Using computer systems deceptively to unlawfully obtain assets or information is:","options":["Computer Fraud","Data Interference","System Interference","Illegal Access"],"answer":0,"explanation":"The module defines this as Computer Fraud.","page":"Module 2, p. 27"},{"id":88,"module":"Module 2","topic":"RA 8792","question":"RA 8792 is the:","options":["Data Privacy Act of 2012","Intellectual Property Code","Electronic Commerce Act","Internet Transactions Act"],"answer":2,"explanation":"RA 8792 is the Electronic Commerce Act.","page":"Module 2, p. 28"},{"id":89,"module":"Module 2","topic":"RA 8792","question":"Which item is legally recognized under RA 8792 according to the module?","options":["Merchant verification records","Electronic documents","Personal information","Copyrighted software licenses"],"answer":1,"explanation":"The Act legally acknowledges electronic documents as valid and enforceable in transactions.","page":"Module 2, p. 28"},{"id":90,"module":"Module 2","topic":"RA 8792","question":"Electronic signatures are legally accepted under RA 8792 primarily to:","options":["Establish ownership of copyrighted software","Grant data subjects control over personal information","Verify merchant identity in online marketplaces","Authenticate digital transactions"],"answer":3,"explanation":"The module says electronic signatures are accepted to authenticate digital transactions.","page":"Module 2, p. 28"},{"id":91,"module":"Module 2","topic":"RA 8293","question":"RA 8293 is the:","options":["Intellectual Property Code","Electronic Commerce Act","Data Privacy Act of 2012","Internet Transactions Act"],"answer":0,"explanation":"RA 8293 is the Intellectual Property Code.","page":"Module 2, p. 29"},{"id":92,"module":"Module 2","topic":"RA 8293","question":"Which is specifically protected under RA 8293 according to the module?","options":["Electronic documents from being rejected in digital transactions","Personal information from unauthorized access and misuse","Software from unauthorized use and reproduction","Online consumers from fraudulent marketplace transactions"],"answer":2,"explanation":"The slide states software is legally protected from unauthorized use and reproduction.","page":"Module 2, p. 29"},{"id":93,"module":"Module 2","topic":"RA 8293","question":"The Intellectual Property Code in the module also protects:","options":["Digital merchants and consumer-support mechanisms","Inventions and trademarks","Personal information and data-subject rights","Electronic documents and signatures"],"answer":1,"explanation":"The module explicitly mentions inventions and trademarks.","page":"Module 2, p. 29"},{"id":94,"module":"Module 2","topic":"RA 11967","question":"What is the primary purpose of RA 11967 in the module?","options":["Recognize electronic documents and signatures as valid transactions","Penalize unauthorized access and interference with computer systems","Protect personal information through organizational safeguards","Enhance consumer trust in electronic commerce and online transactions"],"answer":3,"explanation":"RA 11967 aims to enhance consumer trust in e-commerce and online transactions.","page":"Module 2, p. 31"},{"id":95,"module":"Module 2","topic":"RA 11967","question":"RA 11967 covers which kinds of transactions?","options":["Business-to-Business and Business-to-Consumer","Consumer-to-Consumer and Government-to-Consumer","Business-to-Business only","Business-to-Consumer only"],"answer":0,"explanation":"The scope slide names B2B and B2C internet transactions.","page":"Module 2, p. 32"},{"id":96,"module":"Module 2","topic":"RA 11967","question":"Which is a digital platform responsibility listed in the module?","options":["Fairness and Accountability","Transparency and Disclosures","Merchant Verification","Protection from Fraud"],"answer":2,"explanation":"Digital platform responsibilities include merchant verification, consumer support, and regulatory compliance.","page":"Module 2, p. 33"},{"id":97,"module":"Module 2","topic":"RA 11967","question":"Providing reliable mechanisms to address user concerns is:","options":["Merchant Verification","Consumer Support","Regulatory Compliance","Transparency and Disclosures"],"answer":1,"explanation":"Consumer Support is one of the listed digital platform responsibilities.","page":"Module 2, p. 33"},{"id":98,"module":"Module 2","topic":"RA 11967","question":"Which is a consumer protection provision under RA 11967?","options":["Regulatory Compliance","Consumer Support","Merchant Verification","Transparency and Disclosures"],"answer":3,"explanation":"Transparency and disclosures is one of the three consumer protection provisions.","page":"Module 2, p. 34"},{"id":99,"module":"Module 2","topic":"RA 11967","question":"The provision that holds businesses responsible for how they treat consumers is:","options":["Fairness and Accountability","Merchant Verification","Protection from Fraud","Transparency and Disclosures"],"answer":0,"explanation":"Fairness and Accountability is explicitly listed under consumer protection.","page":"Module 2, p. 34"},{"id":100,"module":"Module 2","topic":"Professional Practice in PH","question":"Which set matches the professional responsibilities in the Philippines listed in the module?","options":["Legal Compliance, Consumer Support, Privacy by Design, Professional Competence","Ethical Principles, Security Considerations, Public Welfare, Professional Judgment","Ethical Principles, Legal Compliance, Privacy Protection, Professional Competence","Ethical Leadership, Privacy Protection, Merchant Verification, Maintaining Competence"],"answer":2,"explanation":"The module lists these four responsibilities for computing professionals in the Philippines.","page":"Module 2, p. 35"},{"id":101,"module":"Module 2","topic":"Data Breach","question":"After a data breach, prompt action to contain the breach and minimize damage is called:","options":["Privacy and Ethical Accountability","Incident Response","Disclosure and Transparency","Security Controls"],"answer":1,"explanation":"The case study identifies prompt incident response as crucial for containment and minimizing damage.","page":"Module 2, p. 36"},{"id":102,"module":"Module 2","topic":"Data Breach","question":"Informing stakeholders and complying with legal requirements after a breach is part of:","options":["Incident Response","Privacy and Ethical Accountability","Security Controls","Disclosure and Transparency"],"answer":3,"explanation":"Disclosure and transparency are emphasized in the data-breach case study.","page":"Module 2, p. 36"},{"id":103,"module":"Module 2","topic":"Best Practices","question":"Considering privacy from the beginning of development is called:","options":["Privacy by Design","Ethical Leadership","Continuous Learning and Compliance","Secure Development"],"answer":0,"explanation":"Privacy by Design means incorporating privacy considerations from the beginning of development.","page":"Module 2, p. 37"},{"id":104,"module":"Module 2","topic":"Best Practices","question":"Which best practice focuses on secure coding to reduce vulnerabilities?","options":["Privacy by Design","Continuous Learning and Compliance","Secure Development","Ethical Leadership"],"answer":2,"explanation":"The module says secure development uses secure coding practices to minimize vulnerabilities.","page":"Module 2, p. 37"},{"id":105,"module":"Module 2","topic":"Best Practices","question":"Which best practice combines ongoing education with adherence to laws?","options":["Privacy by Design","Continuous Learning and Compliance","Ethical Leadership","Secure Development"],"answer":1,"explanation":"The final slide explicitly lists Continuous Learning and Compliance.","page":"Module 2, p. 37"},{"id":106,"module":"Module 3","topic":"Lifelong Learning","question":"Lifelong learning is defined in the module as:","options":["Employer-mandated training focused on current job requirements","Continuous formal education delivered mainly by schools and universities","Institution-directed education focused on formal credentials","Self-initiated education focused on personal development"],"answer":3,"explanation":"The module defines lifelong learning as self-initiated education focused on personal development and occurring outside formal institutions.","page":"Module 3, p. 5"},{"id":107,"module":"Module 3","topic":"Lifelong Learning","question":"The module says lifelong learning recognizes that humans have a natural drive to:","options":["Explore, learn, and grow","Compete, specialize, and certify","Study, test, and qualify","Work, produce, and advance"],"answer":0,"explanation":"The slide states that humans naturally want to explore, learn, and grow.","page":"Module 3, p. 6"},{"id":108,"module":"Module 3","topic":"Lifelong Learning","question":"Personal fulfillment and development can be driven by:","options":["Certification prerequisites, employer policies, and industry competition","Formal credentials, organizational requirements, and promotion standards","Natural interests, curiosity, and motivations","Professional regulations, external rewards, and mandatory training"],"answer":2,"explanation":"The module links natural interests, curiosity, and motivations to learning new things.","page":"Module 3, p. 7"},{"id":109,"module":"Module 3","topic":"Lifelong Learning","question":"Which is a key factor of lifelong learning listed in the module?","options":["Institutionally scheduled","Voluntary","Externally mandated","Credential-dependent"],"answer":1,"explanation":"Voluntary is one of the listed key factors.","page":"Module 3, p. 8"},{"id":110,"module":"Module 3","topic":"Lifelong Learning","question":"Which statement about lifelong learning matches the module?","options":["It is free only when it is completely self-taught","It requires no cost only when it occurs in a formal institution","It normally requires tuition or certification fees","It does not always require a cost"],"answer":3,"explanation":"The module explicitly says it does not always require a cost.","page":"Module 3, p. 8"},{"id":111,"module":"Module 3","topic":"Lifelong Learning","question":"Which statement is true according to the key factors slide?","options":["Lifelong learning is often informal","It is usually formal but may occasionally be self-taught","It normally occurs through corporate or university programs","It is informal only when no instruction is sought"],"answer":0,"explanation":"The module lists “often informal” and “self-taught or instruction that is sought.”","page":"Module 3, p. 8"},{"id":112,"module":"Module 3","topic":"Lifelong Learning","question":"Which is an example of lifelong learning given in the module?","options":["Repeating an already mastered task without a learning goal","Completing only required workplace compliance training","Learning to use a new technology","Avoiding unfamiliar technology until formal training is assigned"],"answer":2,"explanation":"Learning to use a new technology is explicitly listed as an example.","page":"Module 3, p. 9"},{"id":113,"module":"Module 3","topic":"Lifelong Learning","question":"Which is NOT one of the module’s examples of lifelong learning?","options":["Self-taught study","Avoiding all new activities","Developing a new skill","Acquiring new knowledge"],"answer":1,"explanation":"The first three are listed examples; avoiding all new activities contradicts lifelong learning.","page":"Module 3, p. 9"},{"id":114,"module":"Module 3","topic":"Benefits","question":"Which is a benefit of lifelong learning listed in the module?","options":["Reduced need for future skill development","Automatic certification recognition","Guaranteed professional promotion","Renewed self-motivation"],"answer":3,"explanation":"Renewed self-motivation is listed as a benefit.","page":"Module 3, p. 10"},{"id":115,"module":"Module 3","topic":"Benefits","question":"Which benefit relates directly to feeling more capable personally?","options":["Improved Self-Confidence","Improvement on other personal or professional skills","Renewed Self-Motivation","Recognition of Personal Interest or Goals"],"answer":0,"explanation":"Improved self-confidence is one of the four listed benefits.","page":"Module 3, p. 10"},{"id":116,"module":"Module 3","topic":"Adapting Lifelong Learning","question":"What is the first step in adapting lifelong learning?","options":["Make a list of what you would like to learn","Identify how to get involved and available resources","Recognize your own personal interests and goals","Structure the learning goal into your life"],"answer":2,"explanation":"The first listed step is recognizing personal interests and goals.","page":"Module 3, p. 12"},{"id":117,"module":"Module 3","topic":"Adapting Lifelong Learning","question":"After identifying what you would like to learn, the module next emphasizes:","options":["Recognize your own personal interests and goals","Identifying how to get involved and the resources available","Make a commitment","Structure the learning goal into your life"],"answer":1,"explanation":"The third step is identifying how to get involved and what resources are available.","page":"Module 3, p. 12"},{"id":118,"module":"Module 3","topic":"Adapting Lifelong Learning","question":"Which is the final step in the adapting lifelong learning list?","options":["Identify the resources available","Structure the learning goal into your life","Make a list of what you would like to learn","Make a commitment"],"answer":3,"explanation":"The fifth and final adapting step is “Make a commitment.”","page":"Module 3, p. 12"},{"id":119,"module":"Module 3","topic":"Career Preparation","question":"Which is the first item under “Prepare for your aspiration”?","options":["Make a Plan","Cast Your Net(work)","Hone Your Skills","Tailor Your Resume"],"answer":0,"explanation":"The list starts with Make a Plan.","page":"Module 3, p. 14"},{"id":120,"module":"Module 3","topic":"Career Preparation","question":"Which step encourages building professional connections?","options":["Prime Your References","Follow Up (The Right Way)","Cast Your Net(work)","Ask for Help"],"answer":2,"explanation":"The aspiration-preparation slide uses the phrase “Cast Your Net(work).”","page":"Module 3, p. 14"},{"id":121,"module":"Module 3","topic":"Career Preparation","question":"Which step comes immediately before “Negotiate Your Job Offer” in the module’s list?","options":["Prepare and Practice for Interviews","Follow Up (The Right Way)","Dress for Success","Prime Your References"],"answer":1,"explanation":"The list places Follow Up (The Right Way) immediately before Negotiate Your Job Offer.","page":"Module 3, p. 14"},{"id":122,"module":"Module 3","topic":"Certifications","question":"Which certification family is shown with Solutions Architect, DevOps Engineer/Developer, Specialty, and SysOps Admin examples?","options":["Google Cloud Certifications","Microsoft Azure","ISTQB","Amazon Web Service (AWS)"],"answer":3,"explanation":"The Module 3 certification slide groups those examples under AWS certifications.","page":"Module 3, p. 16"},{"id":123,"module":"Module 3","topic":"Certifications","question":"Which platform’s certifications include Azure Administrator, Azure AI Engineer, and Azure Developer?","options":["Microsoft Azure","Oracle Java SE 8","Amazon Web Service (AWS)","Google Cloud Certifications"],"answer":0,"explanation":"Those roles are shown under Microsoft Azure Associate Certifications.","page":"Module 3, p. 16"},{"id":124,"module":"Module 3","topic":"Certifications","question":"Cloud Digital Leader is shown under which certification family?","options":["Microsoft Azure","PhilNITS","Google Cloud Certifications","Amazon Web Service (AWS)"],"answer":2,"explanation":"The slide lists Cloud Digital Leader as a Google Cloud foundational certification.","page":"Module 3, p. 16"},{"id":125,"module":"Module 3","topic":"Certifications","question":"PMP stands for the certification labeled in the module as:","options":["Professional Project Manager","Project Management Professional","Professional Management Practitioner","Project Methodology Professional"],"answer":1,"explanation":"The slide explicitly shows “Project Management Professional (PMP).”","page":"Module 3, p. 17"},{"id":126,"module":"Module 3","topic":"Certifications","question":"Which sequence correctly shows the Professional Scrum Master progression shown in the module?","options":["PSM I, PSPO II, PSM III","PSM I, PSM III, PSM II","PSPO I, PSPO II, PSPO III","PSM I, PSM II, PSM III"],"answer":3,"explanation":"The slide lists Professional Scrum Master PSM I, II, and III.","page":"Module 3, p. 17"},{"id":127,"module":"Module 3","topic":"Certifications","question":"Which sequence correctly shows the Professional Scrum Product Owner progression?","options":["PSPO I, PSPO II, PSPO III","PSM I, PSM II, PSM III","PSPO I, PSPO III, PSPO II","PSPO I, PSM II, PSPO III"],"answer":0,"explanation":"The slide lists PSPO I, II, and III.","page":"Module 3, p. 17"},{"id":128,"module":"Module 3","topic":"Certifications","question":"Which certification body in the module is associated with software testing tracks such as Core, Agile Extension, and Specialist?","options":["Oracle Java SE 8","Professional Scrum Master","ISTQB","PhilNITS"],"answer":2,"explanation":"The Module 3 slides show ISTQB Core, Agile Extension, and Specialist certification tracks.","page":"Module 3, pp. 18–19"},{"id":129,"module":"Module 3","topic":"Certifications","question":"Which ISTQB Specialist example is shown in the module?","options":["Agile Technical Tester","Security Tester","Certified Tester Foundation Level (CTFL)","Agile Tester Foundation Level"],"answer":1,"explanation":"Security Tester appears among the ISTQB specialist examples.","page":"Module 3, p. 18"},{"id":130,"module":"Module 3","topic":"Certifications","question":"Which item is shown next to “PhilNITS Exam” in the module?","options":["Certified Tester Foundation Level","OJC Associate","Cloud Digital Leader","Applied IT Engr."],"answer":3,"explanation":"The slide shows “PhilNITS Exam – Applied IT Engr.”","page":"Module 3, p. 18"},{"id":131,"module":"Module 3","topic":"Certifications","question":"Which technology is associated with OJC Associate, OJC Professional, and OJC Master on the slide?","options":["Oracle Java SE 8","Android Mobile App Development","C/C++ Certified Programmer","Python Programmer Certification"],"answer":0,"explanation":"Those OJC levels appear under Oracle Java SE 8.","page":"Module 3, p. 18"},{"id":132,"module":"Module 3","topic":"Certifications","question":"What is the entry-level Python certification shown in the module?","options":["CTFL","PCPP 1 & 2","PCEP","PCAP"],"answer":2,"explanation":"The slide labels PCEP as Entry Level.","page":"Module 3, p. 18"},{"id":133,"module":"Module 3","topic":"Certifications","question":"What is the associate-level Python certification shown in the module?","options":["PCEP","PCAP","PSM I","PCPP 1 & 2"],"answer":1,"explanation":"The slide labels PCAP as Associate Level.","page":"Module 3, p. 18"},{"id":134,"module":"Module 3","topic":"Certifications","question":"What is the professional-level Python certification shown in the module?","options":["CTAL-TM","PCEP","PCAP","PCPP 1 & 2"],"answer":3,"explanation":"The slide labels PCPP 1 & 2 as Professional Level.","page":"Module 3, p. 18"},{"id":135,"module":"Module 3","topic":"IT in Academe","question":"Which is categorized as research-based in the IT in Academe slide?","options":["Doctor of Information Technology","Professional Certifications (PCpE)","Masters Degree of aligned Discipline","Professional Regulatory Board Examinations (CCpE)"],"answer":0,"explanation":"Doctor of Information Technology is listed under Research Based.","page":"Module 3, p. 20"},{"id":136,"module":"Module 3","topic":"IT in Academe","question":"Which is categorized as instruction-based?","options":["Doctor of Engineering (Discipline)","Professional Certifications (PCpE)","Masters Degree of aligned Discipline","Doctor of Information Technology"],"answer":2,"explanation":"The slide lists Masters Degree of aligned Discipline under Instruction Based.","page":"Module 3, p. 20"},{"id":137,"module":"Module 3","topic":"IT in Academe","question":"Professional Regulatory Board Examinations are labeled in the slide as:","options":["PCpE","CCpE","PCAP","PCEP"],"answer":1,"explanation":"The module shows “Professional Regulatory Board Examinations (CCpE).”","page":"Module 3, p. 20"},{"id":138,"module":"Module 3","topic":"IT in Academe","question":"Professional Certifications are labeled in the slide as:","options":["PCPP","CCpE","PCEP","PCpE"],"answer":3,"explanation":"The module shows “Professional Certifications (PCpE).”","page":"Module 3, p. 20"},{"id":139,"module":"Module 3","topic":"SWOT-R","question":"In SWOT-R, the letter R stands for:","options":["Recommendation","Reflection","Responsibility","Risk"],"answer":0,"explanation":"The Personal SWOT Analysis slide adds Recommendation after SWOT.","page":"Module 3, p. 21"},{"id":140,"module":"Module 3","topic":"SWOT-R","question":"In the module’s Personal SWOT Analysis, opportunities are described as:","options":["Internal limitations that need improvement","External conditions that may block an opportunity","Opportunities you would like to have according to your strength","Recommended steps based mainly on identified threats"],"answer":2,"explanation":"The slide ties opportunities to what you would like to have according to your strength.","page":"Module 3, p. 21"},{"id":141,"module":"Module 3","topic":"SWOT-R","question":"Threats in the Personal SWOT Analysis refer to:","options":["Recommended actions for improving identified weaknesses","Threats that could arise while applying the opportunity","Internal weaknesses that reduce present competence","Opportunities that arise directly from existing strengths"],"answer":1,"explanation":"The slide describes threats as things that could come along when applying the opportunity.","page":"Module 3, p. 21"},{"id":142,"module":"Module 3","topic":"SWOT-R","question":"Which sequence matches the module’s SWOT-R order?","options":["Strength, Weakness, Threats, Opportunities, Recommendation","Weakness, Strength, Opportunities, Threats, Recommendation","Strength, Opportunities, Weakness, Threats, Recommendation","Strength, Weakness, Opportunities, Threats, Recommendation"],"answer":3,"explanation":"The slide presents Strength, Weaknesses, Opportunities, Threats, and Recommendation.","page":"Module 3, p. 21"}];
+const SCENARIOS = [{"title": "Secret Personal-Data Collection", "scenario": "A mobile application collects users’ names, contact details, and location data without clearly informing them.", "apply": ["ACM: Respect Intellectual Property, Privacy, and Confidentiality", "RA 10173: Data Privacy Act of 2012", "Professional responsibility: Privacy Protection"], "action": "Explain that personal information must be protected, processed lawfully, and handled transparently. Recommend correcting the data-collection practice, protecting existing data, and implementing proper safeguards.", "tip": "Keyword trigger: personal information / privacy → RA 10173."}, {"title": "Unauthorized Server Entry", "scenario": "A person enters a company server without permission but does not change any files.", "apply": ["RA 10175: Cybercrime Prevention Act of 2012", "Specific concept: Illegal Access", "ACM: Avoid Harm / privacy and security responsibilities"], "action": "Identify the unauthorized access, explain why it is prohibited, and recommend reporting through proper channels instead of exploiting the system.", "tip": "Unauthorized entry = Illegal Access."}, {"title": "Deleted Database Records", "scenario": "An attacker gains access to a database and deletes important records.", "apply": ["RA 10175", "Specific concept: Data Interference", "ACM: Avoid Harm"], "action": "Emphasize that unauthorized alteration or deletion of data is Data Interference and that the response should contain the incident, protect data integrity, and restore secure operation.", "tip": "Changed/deleted data = Data Interference."}, {"title": "Network Disruption", "scenario": "An attacker intentionally causes a company network to stop functioning.", "apply": ["RA 10175", "Specific concept: System Interference"], "action": "Explain that disrupting or damaging a system or network is System Interference, then recommend containment, incident response, and security improvements.", "tip": "System/network disruption = System Interference."}, {"title": "Computer-Based Fraud", "scenario": "A scammer uses a computer system to deceive victims into transferring money.", "apply": ["RA 10175", "Specific concept: Computer Fraud"], "action": "State that the deception uses a computer to unlawfully obtain assets, matching Computer Fraud.", "tip": "Deception + computer + assets/information = Computer Fraud."}, {"title": "Biased AI Hiring", "scenario": "An AI hiring system consistently rejects applicants from a particular group even when they have comparable qualifications.", "apply": ["ACM: Promote Fairness and Non-Discrimination", "IEEE: Professional Competence and Fair Treatment", "Modern issue: Algorithmic Bias and AI Governance"], "action": "Recommend investigating bias, testing and correcting the model, using objective evidence, documenting decisions, and ensuring fair treatment.", "tip": "Discrimination → ACM Fairness + IEEE Fair Treatment + Algorithmic Bias."}, {"title": "Dangerous Software Release", "scenario": "A developer knows a system may physically harm users but releases it without disclosing the risk.", "apply": ["ACM: Avoid Harm", "IEEE: Public Safety, Health, and Welfare", "Software Engineering Code: Public"], "action": "Explain that public safety takes priority. The risk should be disclosed, the software should be corrected/tested, and release should not proceed when safety is not reasonably established.", "tip": "Physical/public danger → Avoid Harm + Public Safety + Public."}, {"title": "Bribe for Approval", "scenario": "An engineer receives money from a vendor in exchange for approving a defective system.", "apply": ["IEEE: Honesty, Anti-Bribery, and Transparency", "IEEE: Conflicts of Interest and Integrity", "Software Engineering Code: Judgment"], "action": "Reject the bribe, disclose the conflict, maintain objective judgment, and evaluate the system based on evidence and professional standards.", "tip": "Bribe → IEEE Anti-Bribery + Judgment."}, {"title": "Colleague Credit", "scenario": "A programmer presents a teammate’s work as entirely their own.", "apply": ["Software Engineering Code: Colleagues"], "action": "Explain that professionals should credit the work of others and treat colleagues fairly and supportively.", "tip": "Taking another person’s credit → Colleagues."}, {"title": "Pirated Software in a Project", "scenario": "A developer installs an unauthorized copy of commercial software to finish a client project.", "apply": ["RA 8293: Intellectual Property Code", "ACM: Respect Intellectual Property, Privacy, and Confidentiality", "Software Engineering Code: Client and Employer"], "action": "Use properly authorized software, respect copyrights/licenses, and correct the project’s licensing issue.", "tip": "Copyright / unauthorized software copy → RA 8293."}, {"title": "Hospital Data Breach", "scenario": "A hospital database containing patient information is accidentally exposed online because of weak security practices.", "apply": ["RA 10173: Data Privacy Act of 2012", "ACM: Avoid Harm and Privacy/Confidentiality", "Professional responsibility: Security Considerations"], "action": "Apply the module’s four breach ideas: security controls, prompt incident response, disclosure/transparency, and privacy/ethical accountability.", "tip": "For breach essays, use: Controls → Response → Disclosure → Accountability."}, {"title": "Online Marketplace Scam", "scenario": "An online marketplace allows an unverified seller to operate, and consumers are defrauded.", "apply": ["RA 11967: Internet Transactions Act", "Digital platform responsibility: Merchant Verification", "Consumer provision: Protection from Fraud"], "action": "Explain the platform’s responsibility to verify merchants, support consumers, comply with regulation, and protect users from fraudulent online transactions.", "tip": "Online marketplace + consumer protection → RA 11967."}, {"title": "Electronic Signature Question", "scenario": "A business asks whether an electronic signature can authenticate a digital transaction.", "apply": ["RA 8792: Electronic Commerce Act", "Electronic Signatures Validity"], "action": "Explain that the module recognizes electronic signatures as legally accepted for authenticating digital transactions under the Act.", "tip": "Electronic signature/document → RA 8792."}, {"title": "Manager Hides a Security Problem", "scenario": "A software manager orders the team not to report a major security weakness because it could delay release.", "apply": ["Software Engineering Code: Management", "ACM: Be Honest and Trustworthy", "ACM: Avoid Harm"], "action": "Managers should maintain an ethical development environment, not suppress ethical concerns, and should address risks honestly and responsibly.", "tip": "Unethical direction by a leader → Management."}, {"title": "Outdated Skills Cause Errors", "scenario": "A professional repeatedly makes serious mistakes because they refuse to update their technical knowledge.", "apply": ["Software Engineering Code: Self", "IEEE: Professional Competence and Fair Treatment", "Professional responsibility: Maintaining Competence", "Module 3: Lifelong Learning"], "action": "Explain that computing professionals must continuously improve their skills and knowledge to remain competent and produce responsible, high-quality work.", "tip": "Own skills/continuous improvement → Self + Competence + Lifelong Learning."}];
+let filter = 'All';
+let order = [...QUESTION_BANK.map((_,i)=>i)];
+let questionOrder = 'ordered';
+let current = 0;
+let answers = {};
+let graded = {};
+let finished = false;
+
+const el = id => document.getElementById(id);
+const tabs = ['All','Module 1','Module 2','Module 3'];
+
+function filteredOrder() {
+  return order.filter(i => filter === 'All' || QUESTION_BANK[i].module === filter);
+}
+function currentQuestion() { return QUESTION_BANK[filteredOrder()[current]]; }
+function currentGlobalIndex() { return filteredOrder()[current]; }
+function mode() { return el('mode').value; }
+function letter(i) { return ['A','B','C','D'][i]; }
+
+function renderTabs() {
+  el('tabs').innerHTML = tabs.map(t=>`<button class="tab ${t===filter?'active':''}" data-tab="${t}">${t}</button>`).join('');
+  document.querySelectorAll('.tab').forEach(b=>b.addEventListener('click',()=>{filter=b.dataset.tab;current=0;finished=false;renderTabs();render();}));
+}
+
+function render() {
+  const list = filteredOrder();
+  if (!list.length) return;
+  if (current >= list.length) current = list.length - 1;
+  const q = currentQuestion();
+  const gi = currentGlobalIndex();
+  el('modulePill').textContent = q.module;
+  el('topicPill').textContent = q.topic;
+  el('pageLabel').textContent = q.page;
+  el('questionText').textContent = `${current+1}. ${q.question}`;
+  el('progressBar').style.width = `${((current+1)/list.length)*100}%`;
+  const chosen = answers[gi];
+  const shouldReveal = mode()==='study' && graded[gi];
+  el('options').innerHTML = q.options.map((o,i)=>{
+    let cls='option';
+    if (chosen===i) cls+=' selected';
+    if (shouldReveal && i===q.answer) cls+=' correct';
+    if (shouldReveal && chosen===i && chosen!==q.answer) cls+=' wrong';
+    return `<button class="${cls}" data-choice="${i}" ${shouldReveal?'disabled':''}><span class="key">${letter(i)}</span><span>${o}</span></button>`;
+  }).join('');
+  document.querySelectorAll('.option').forEach(b=>b.addEventListener('click',()=>choose(+b.dataset.choice)));
+  const fb=el('feedback');
+  if (shouldReveal) {
+    const ok = chosen===q.answer;
+    fb.className='feedback show '+(ok?'good':'bad');
+    if(ok){
+      fb.innerHTML=`<strong>Correct ✓</strong><div class="correct-answer">${letter(q.answer)}. ${q.options[q.answer]}</div><div class="why"><b>Why:</b> ${q.explanation} <span style="color:var(--muted)">(${q.page})</span></div>`;
+    } else {
+      fb.innerHTML=`<strong>Incorrect ✗</strong><div class="your-answer"><b>Your answer:</b> ${letter(chosen)}. ${q.options[chosen]}</div><div class="correct-answer"><b>Correct answer:</b> ${letter(q.answer)}. ${q.options[q.answer]}</div><div class="why"><b>Why the correct answer applies:</b> ${q.explanation} <span style="color:var(--muted)">(${q.page})</span></div>`;
+    }
+  } else { fb.className='feedback'; fb.innerHTML=''; }
+  el('prevBtn').disabled = current===0;
+  el('nextBtn').textContent = current===list.length-1 ? 'Finish →' : 'Next →';
+  updateStats();
+}
+
+function choose(choice) {
+  const gi=currentGlobalIndex();
+  if (mode()==='study' && graded[gi]) return;
+  answers[gi]=choice;
+  if (mode()==='study') graded[gi]=true;
+  save(); render();
+}
+
+function next() {
+  const list=filteredOrder();
+  if (current<list.length-1) {current++; render();}
+  else finish();
+}
+function prev() { if(current>0){current--;render();} }
+
+function updateStats() {
+  const list=filteredOrder();
+  const answered=list.filter(i=>answers[i]!==undefined);
+  const correct=answered.filter(i=>answers[i]===QUESTION_BANK[i].answer);
+  const wrong=answered.length-correct.length;
+  el('answeredStat').textContent=answered.length;
+  el('correctStat').textContent=correct.length;
+  el('wrongStat').textContent=wrong;
+  el('remainingStat').textContent=list.length-answered.length;
+  const pct=answered.length?Math.round(correct.length/answered.length*100):0;
+  el('headerScore').textContent=pct+'%';
+}
+
+function finish() {
+  const list=filteredOrder();
+  if (mode()==='exam') list.forEach(i=>graded[i]=answers[i]!==undefined);
+  const answered=list.filter(i=>answers[i]!==undefined);
+  const correct=list.filter(i=>answers[i]===QUESTION_BANK[i].answer);
+  const pct=Math.round(correct.length/list.length*100);
+  finished=true;
+  el('resultBox').classList.add('show');
+  el('resultText').innerHTML=`Score: <b>${correct.length} / ${list.length} (${pct}%)</b>. Answered ${answered.length} question(s). Review missed or unanswered items below.`;
+  const missed=list.filter(i=>answers[i]!==QUESTION_BANK[i].answer);
+  el('reviewList').innerHTML=missed.slice(0,30).map(i=>{const q=QUESTION_BANK[i]; const a=answers[i]; return `<div class="review-item"><b>${q.question}</b><br><small>Your answer: ${a===undefined?'Unanswered':letter(a)+'. '+q.options[a]}<br>Correct: ${letter(q.answer)}. ${q.options[q.answer]} — ${q.explanation} (${q.page})</small></div>`}).join('') || '<div class="review-item"><b>Perfect score — excellent recall.</b></div>';
+  el('resultBox').scrollIntoView({behavior:'smooth',block:'start'});
+  save();
+}
+
+function naturalOrder() {
+  return [...QUESTION_BANK.map((_,i)=>i)];
+}
+function randomizeOrder() {
+  order = naturalOrder();
+  for(let i=order.length-1;i>0;i--){
+    const j=Math.floor(Math.random()*(i+1));
+    [order[i],order[j]]=[order[j],order[i]];
+  }
+}
+function applyQuestionOrder(reshuffle=false) {
+  questionOrder = el('questionOrder').value;
+  if(questionOrder==='ordered') {
+    order = naturalOrder();
+  } else if(reshuffle || !Array.isArray(order) || order.length!==QUESTION_BANK.length) {
+    randomizeOrder();
+  } else {
+    randomizeOrder();
+  }
+  current=0; finished=false; el('resultBox').classList.remove('show'); save(); render();
+}
+function shuffle() {
+  questionOrder='shuffled';
+  el('questionOrder').value='shuffled';
+  randomizeOrder();
+  current=0; finished=false; el('resultBox').classList.remove('show'); save(); render();
+}
+function reset() {
+  if(!confirm('Reset all answers and progress?')) return;
+  answers={};graded={};finished=false;current=0;order=naturalOrder();questionOrder='ordered';
+  el('questionOrder').value='ordered';
+  localStorage.removeItem('cpe26-reviewer-v4');el('resultBox').classList.remove('show');render();
+}
+function save() {
+  localStorage.setItem('cpe26-reviewer-v4',JSON.stringify({answers,graded,order,questionOrder,filter,mode:mode()}));
+}
+function load() {
+  try {
+    const s=JSON.parse(localStorage.getItem('cpe26-reviewer-v4'));
+    if(!s) return;
+    answers=s.answers||{}; graded=s.graded||{};
+    if(Array.isArray(s.order)&&s.order.length===QUESTION_BANK.length) order=s.order;
+    if(tabs.includes(s.filter)) filter=s.filter;
+    if(['study','exam'].includes(s.mode)) el('mode').value=s.mode;
+    if(['ordered','shuffled'].includes(s.questionOrder)) {
+      questionOrder=s.questionOrder;
+    } else {
+      const natural=naturalOrder();
+      questionOrder=order.every((v,i)=>v===natural[i])?'ordered':'shuffled';
+    }
+    el('questionOrder').value=questionOrder;
+    if(questionOrder==='ordered') order=naturalOrder();
+  } catch(e){}
+}
+
+el('nextBtn').addEventListener('click',next);
+el('prevBtn').addEventListener('click',prev);
+el('submitBtn').addEventListener('click',finish);
+el('shuffleBtn').addEventListener('click',shuffle);
+el('questionOrder').addEventListener('change',()=>applyQuestionOrder(false));
+el('resetBtn').addEventListener('click',reset);
+el('mode').addEventListener('change',()=>{graded={};finished=false;el('resultBox').classList.remove('show');el('modeNote').textContent=mode()==='study'?'Choose an answer to see the correct answer and explanation immediately.':'Answers stay hidden until you finish and score the set.';save();render();});
+
+document.addEventListener('keydown',e=>{
+  if(['INPUT','SELECT','TEXTAREA'].includes(document.activeElement.tagName)) return;
+  if(['1','2','3','4'].includes(e.key)) choose(+e.key-1);
+  if(e.key==='ArrowRight') next();
+  if(e.key==='ArrowLeft') prev();
+});
+
+function renderScenarios() {
+  el('scenarioGrid').innerHTML=SCENARIOS.map((s,i)=>`<article class="card scenario"><div class="eyebrow">Scenario ${i+1}</div><h3>${s.title}</h3><p>${s.scenario}</p><button class="btn" data-guide="${i}">Show Answer Guide</button><div class="guide" id="guide-${i}"><b>Apply:</b><ul>${s.apply.map(x=>`<li>${x}</li>`).join('')}</ul><b>Correct action:</b> ${s.action}<br><br><b>Tip:</b> ${s.tip}</div></article>`).join('');
+  document.querySelectorAll('[data-guide]').forEach(b=>b.addEventListener('click',()=>{const g=el('guide-'+b.dataset.guide);g.classList.toggle('show');b.textContent=g.classList.contains('show')?'Hide Guide':'Show Answer Guide';}));
+}
+
+load();renderTabs();renderScenarios();
+el('modeNote').textContent=mode()==='study'?'Choose an answer to see the correct answer and explanation immediately.':'Answers stay hidden until you finish and score the set.';
+render();
+</script>
+<script>
+if ('serviceWorker' in navigator && location.protocol !== 'file:') {
+  window.addEventListener('load', () => navigator.serviceWorker.register('sw.js').catch(() => {}));
+}
+</script>
+</body>
+</html>
